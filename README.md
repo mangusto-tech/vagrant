@@ -1,0 +1,4 @@
+vagrant
+=======
+
+Vagrant experimental projects
