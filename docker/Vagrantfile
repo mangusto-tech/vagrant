@@ -1,0 +1,44 @@
+DOCKER_HOST_NAME = "dockerhost"
+
+Vagrant.configure("2") do |config|
+
+  config.vm.define "#{DOCKER_HOST_NAME}"
+  config.vm.box = "mitchellh/boot2docker"
+  
+  config.vm.provider "virtualbox" do |v|
+    # On VirtualBox, we don't have guest additions or a functional vboxsf
+    # in TinyCore Linux, so tell Vagrant that so it can be smarter.
+    v.check_guest_additions = false
+    v.functional_vboxsf     = false
+    v.name = "#{DOCKER_HOST_NAME}"
+  end
+   
+  ["vmware_fusion", "vmware_workstation"].each do |vmware|
+    config.vm.provider vmware do |v|
+      if v.respond_to?(:functional_hgfs=)
+        v.functional_hgfs = false
+      end
+      v.name = "#{DOCKER_HOST_NAME}"
+    end
+  end
+
+  # b2d doesn't support NFS
+  config.nfs.functional = false
+
+  # mitchellh/boot2docker already have docker installed
+  #config.vm.provision "docker"
+
+  # mitchellh/boot2docker already have docker installed
+  # The following line terminates all ssh connections. Therefore
+  # Vagrant will be forced to reconnect.
+  # That's a workaround to have the docker command in the PATH
+  #config.vm.provision "shell", inline:
+  #  "ps aux | grep 'sshd:' | awk '{print $2}' | xargs kill"
+
+  config.vm.network "forwarded_port",
+    guest: 8080, host: 8080
+
+  config.vm.provider :virtualbox do |vb|
+      vb.name = "#{DOCKER_HOST_NAME}" 
+  end
+end
