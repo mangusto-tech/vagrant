@@ -1,8 +1,8 @@
 ENV['VAGRANT_DEFAULT_PROVIDER'] = 'docker'
 
 DOCKER_HOST_NAME = "dockerhost"
-BASE_NAME = "redis-cluster"
-IMAGE_NAME = "#{BASE_NAME}-image"
+BASE_NAME = File.dirname(__FILE__).split('/').last
+IMAGE_NAME = "#{File.dirname(__FILE__).split('/').last}-image"
 
 #$script = <<SCRIPT
 #cd /src/vertx
