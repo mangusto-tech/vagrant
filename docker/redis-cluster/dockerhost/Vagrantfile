@@ -1,5 +1,8 @@
 DOCKER_HOST_NAME = File.dirname(__FILE__).split('/').last
 
+VM_MEMORY = 4096
+VM_CPUS = 4
+
 Vagrant.configure("2") do |config|
 
   config.vm.define "#{DOCKER_HOST_NAME}"
@@ -11,6 +14,8 @@ Vagrant.configure("2") do |config|
     v.check_guest_additions = false
     v.functional_vboxsf     = false
     v.name = "#{DOCKER_HOST_NAME}"
+    v.memory = VM_MEMORY
+    v.cpus = VM_CPUS 
   end
    
   ["vmware_fusion", "vmware_workstation"].each do |vmware|
@@ -19,6 +24,8 @@ Vagrant.configure("2") do |config|
         v.functional_hgfs = false
       end
       v.name = "#{DOCKER_HOST_NAME}"
+      v.vmx["memsize"] = "#{VM_MEMORY}"
+      v.vmx["numvcpus"] = "#{VM_CPUS}"
     end
   end
 
@@ -35,10 +42,16 @@ Vagrant.configure("2") do |config|
   #config.vm.provision "shell", inline:
   #  "ps aux | grep 'sshd:' | awk '{print $2}' | xargs kill"
 
+
+  (7001..7003).each do |port|
+    config.vm.network "forwarded_port",
+      guest: port, host: port
+  end
+  
   config.vm.network "forwarded_port",
     guest: 8080, host: 8080
 
-  config.vm.provider :virtualbox do |vb|
-      vb.name = "#{DOCKER_HOST_NAME}" 
-  end
+  #config.vm.provider :virtualbox do |vb|
+  #    vb.name = "#{DOCKER_HOST_NAME}" 
+  #end
 end
