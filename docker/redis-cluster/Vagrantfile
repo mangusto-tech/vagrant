@@ -13,22 +13,25 @@ Vagrant.configure("2") do |config|
 
   #config.vm.provision "shell", inline: $script
 
-  config.vm.define "#{IMAGE_NAME}" do |a|
-    a.vm.provider "docker" do |d|
-       
-      #d.image = "#{IMAGE_NAME}:latest"
-      d.build_dir = "."
-       
-      d.build_args = ["-t=#{IMAGE_NAME}"]
-      d.ports = ["8080:8080"]
-      d.name = "#{BASE_NAME}"
-      d.remains_running = true
-      #d.has_ssh = true
-      d.cmd = [ "vertx", "run", "vertx-examples/src/raw/java/httphelloworld/HelloWorldServer.java" ]
-      #d.volumes = ["/src/vertx/:/usr/local/src"]
-       
-      d.vagrant_machine = "#{DOCKER_HOST_NAME}"
-      d.vagrant_vagrantfile = "./#{DOCKER_HOST_NAME}/Vagrantfile"
+
+  (7001..7003).each do |port|
+    config.vm.define "#{IMAGE_NAME}-#{port}" do |a|
+      a.vm.provider "docker" do |d|
+         
+        #d.image = "#{IMAGE_NAME}:latest"
+        d.build_dir = "."
+         
+        d.build_args = ["-t=#{IMAGE_NAME}"]
+        d.ports = ["#{port}:8080"]
+        d.name = "#{BASE_NAME}-#{port}"
+        d.remains_running = true
+        #d.has_ssh = true
+        d.cmd = [ "vertx", "run", "vertx-examples/src/raw/java/httphelloworld/HelloWorldServer.java" ]
+        #d.volumes = ["/src/vertx/:/usr/local/src"]
+         
+        d.vagrant_machine = "#{DOCKER_HOST_NAME}"
+        d.vagrant_vagrantfile = "./#{DOCKER_HOST_NAME}/Vagrantfile"
+      end
     end
   end
   #config.ssh.username = "root"
